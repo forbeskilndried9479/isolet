@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>isolet demo</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #0a0a0a;
+        color: #e5e5e5;
+        padding: 2rem;
+        line-height: 1.5;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .subtitle {
+        color: #737373;
+        margin-bottom: 2rem;
+        font-size: 0.875rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .card {
+        background: #171717;
+        border: 1px solid #262626;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+      }
+
+      .card h2 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+
+      .card p {
+        font-size: 0.75rem;
+        color: #737373;
+        margin-bottom: 1rem;
+      }
+
+      .card .mount-target {
+        min-height: 60px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .controls button {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        border: 1px solid #404040;
+        background: #262626;
+        color: #e5e5e5;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .controls button:hover {
+        background: #404040;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>isolet</h1>
+    <p class="subtitle">Each widget below is an isolated component rendered via createIsolet.</p>
+    <div class="grid">
+      <div class="card">
+        <h2>Shadow DOM (vanilla)</h2>
+        <p>Full CSS isolation. Styles don't leak in or out.</p>
+        <div class="mount-target" id="shadow-vanilla"></div>
+        <div class="controls">
+          <button data-action="update" data-target="shadow-vanilla">Update</button>
+          <button data-action="unmount" data-target="shadow-vanilla">Unmount</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scoped (vanilla)</h2>
+        <p>Renders in a plain div. Host page styles apply.</p>
+        <div class="mount-target" id="scoped-vanilla"></div>
+        <div class="controls">
+          <button data-action="update" data-target="scoped-vanilla">Update</button>
+          <button data-action="unmount" data-target="scoped-vanilla">Unmount</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Shadow DOM (React)</h2>
+        <p>React component rendered inside shadow DOM.</p>
+        <div class="mount-target" id="shadow-react"></div>
+        <div class="controls">
+          <button data-action="update" data-target="shadow-react">Update</button>
+          <button data-action="unmount" data-target="shadow-react">Unmount</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>No isolation (vanilla)</h2>
+        <p>Mounts directly into the target element.</p>
+        <div class="mount-target" id="none-vanilla"></div>
+        <div class="controls">
+          <button data-action="update" data-target="none-vanilla">Update</button>
+          <button data-action="unmount" data-target="none-vanilla">Unmount</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

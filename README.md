@@ -1,5 +1,7 @@
 # isolet
 
+> **Warning:** This project is very experimental. APIs may change without notice.
+
 Package any component into a self-contained, isolated widget.
 
 Works with React, Solid, Svelte, vanilla JS, or anything that can render into a DOM element. Ships as a script tag, ESM import, or CommonJS require.
@@ -7,7 +9,7 @@ Works with React, Solid, Svelte, vanilla JS, or anything that can render into a 
 ## Install
 
 ```sh
-npm install isolet
+npm install isolet-js
 ```
 
 ## Quick start
@@ -15,7 +17,7 @@ npm install isolet
 The core API is one function: `createIsolet`. You give it a name, a mount function, and optionally some CSS. It gives you back `mount`, `update`, and `unmount`.
 
 ```ts
-import { createIsolet } from "isolet";
+import { createIsolet } from "isolet-js";
 
 const widget = createIsolet({
   name: "hello",
@@ -37,8 +39,8 @@ Adapters are thin wrappers that handle framework-specific mounting. The core doe
 ### React
 
 ```ts
-import { createIsolet } from "isolet";
-import { react } from "isolet/react";
+import { createIsolet } from "isolet-js";
+import { react } from "isolet-js/react";
 import { MyComponent } from "./MyComponent";
 
 const widget = createIsolet({
@@ -55,8 +57,8 @@ widget.unmount();
 ### Vanilla
 
 ```ts
-import { createIsolet } from "isolet";
-import { vanilla } from "isolet/vanilla";
+import { createIsolet } from "isolet-js";
+import { vanilla } from "isolet-js/vanilla";
 
 const widget = createIsolet({
   name: "counter",
@@ -142,7 +144,7 @@ For build-time CSS inlining, use the included css-text plugin in your vite confi
 
 ```ts
 // vite.config.ts
-import { cssTextPlugin } from "isolet/plugins/css-text";
+import { cssTextPlugin } from "isolet-js/plugins/css-text";
 ```
 
 ## Script tag usage
@@ -150,7 +152,7 @@ import { cssTextPlugin } from "isolet/plugins/css-text";
 The IIFE build exposes `globalThis.__ISOLET__`:
 
 ```html
-<script src="https://unpkg.com/isolet/dist/index.iife.js"></script>
+<script src="https://unpkg.com/isolet-js/dist/index.iife.js"></script>
 <script>
   const { createIsolet } = __ISOLET__;
 
@@ -168,15 +170,15 @@ The IIFE build exposes `globalThis.__ISOLET__`:
 ## CLI
 
 ```sh
-npx isolet init    # scaffold an isolet.config.ts
-npx isolet build   # bundle widgets from config
+npx isolet-js-cli init    # scaffold an isolet.config.ts
+npx isolet-js-cli build   # bundle widgets from config
 ```
 
 The config file:
 
 ```ts
 // isolet.config.ts
-import { defineConfig } from "isolet";
+import { defineConfig } from "isolet-js";
 
 export default defineConfig({
   name: "my-widget",
