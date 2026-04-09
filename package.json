@@ -14,9 +14,13 @@
     "lint:fix": "vp lint --fix",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
-    "check": "vp check"
+    "check": "vp check",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "@types/node": "^22.0.0",
     "@voidzero-dev/vite-plus-core": "^0.1.12",
     "turbo": "^2.9.3",
