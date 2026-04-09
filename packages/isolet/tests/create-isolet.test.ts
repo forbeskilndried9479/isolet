@@ -1,0 +1,173 @@
+import { describe, it, expect, vi } from "vitest";
+import { createIsolet } from "../src/create-isolet.js";
+
+describe("createIsolet", () => {
+  it("starts unmounted", () => {
+    const widget = createIsolet({
+      name: "test",
+      mount: () => {},
+    });
+    expect(widget.mounted).toBe(false);
+    expect(widget.container).toBeNull();
+    expect(widget.shadowRoot).toBeNull();
+  });
+
+  it("mounts into shadow DOM by default", () => {
+    const mount = vi.fn();
+    const widget = createIsolet({ name: "shadow-test", mount });
+
+    const target = document.createElement("div");
+    widget.mount(target, { value: 1 });
+
+    expect(widget.mounted).toBe(true);
+    expect(widget.container).toBeInstanceOf(HTMLElement);
+    expect(widget.shadowRoot).toBeInstanceOf(ShadowRoot);
+    expect(mount).toHaveBeenCalledOnce();
+    expect(mount).toHaveBeenCalledWith(widget.container, { value: 1 });
+
+    widget.unmount();
+  });
+
+  it("injects CSS into shadow root", () => {
+    const css = "h1 { color: red; }";
+    const widget = createIsolet({
+      name: "css-test",
+      mount: () => {},
+      css,
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    const style = widget.shadowRoot?.querySelector("style");
+    expect(style).toBeTruthy();
+    expect(style?.textContent).toBe(css);
+
+    widget.unmount();
+  });
+
+  it("mounts in scoped mode without shadow DOM", () => {
+    const widget = createIsolet({
+      name: "scoped-test",
+      mount: () => {},
+      isolation: "scoped",
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    expect(widget.mounted).toBe(true);
+    expect(widget.shadowRoot).toBeNull();
+    expect(widget.container).toBeInstanceOf(HTMLElement);
+    expect(target.querySelector("[data-isolet='scoped-test']")).toBeTruthy();
+
+    widget.unmount();
+  });
+
+  it("mounts in none mode directly into target", () => {
+    const mount = vi.fn();
+    const widget = createIsolet({
+      name: "none-test",
+      mount,
+      isolation: "none",
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    expect(widget.mounted).toBe(true);
+    expect(widget.shadowRoot).toBeNull();
+    expect(widget.container).toBe(target);
+    expect(mount).toHaveBeenCalledWith(target, {});
+
+    widget.unmount();
+  });
+
+  it("calls mount again on update without cleanup", () => {
+    const mount = vi.fn();
+    const widget = createIsolet({ name: "update-test", mount });
+
+    const target = document.createElement("div");
+    widget.mount(target, { count: 0 });
+    expect(mount).toHaveBeenCalledTimes(1);
+
+    widget.update({ count: 1 });
+    expect(mount).toHaveBeenCalledTimes(2);
+    expect(mount).toHaveBeenLastCalledWith(widget.container, { count: 1 });
+
+    widget.unmount();
+  });
+
+  it("calls cleanup on unmount", () => {
+    const cleanup = vi.fn();
+    const widget = createIsolet({
+      name: "cleanup-test",
+      mount: () => cleanup,
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+    expect(cleanup).not.toHaveBeenCalled();
+
+    widget.unmount();
+    expect(cleanup).toHaveBeenCalledOnce();
+    expect(widget.mounted).toBe(false);
+  });
+
+  it("ignores mount when already mounted", () => {
+    const mount = vi.fn();
+    const widget = createIsolet({ name: "double-mount", mount });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+    widget.mount(target);
+
+    expect(mount).toHaveBeenCalledOnce();
+    widget.unmount();
+  });
+
+  it("ignores update and unmount when not mounted", () => {
+    const mount = vi.fn();
+    const widget = createIsolet({ name: "not-mounted", mount });
+
+    widget.update({ x: 1 });
+    widget.unmount();
+
+    expect(mount).not.toHaveBeenCalled();
+  });
+
+  it("removes host element on unmount", () => {
+    const widget = createIsolet({
+      name: "remove-test",
+      mount: () => {},
+    });
+
+    const target = document.createElement("div");
+    document.body.appendChild(target);
+    widget.mount(target);
+
+    expect(target.querySelector("[data-isolet='remove-test']")).toBeTruthy();
+
+    widget.unmount();
+    expect(target.querySelector("[data-isolet='remove-test']")).toBeNull();
+
+    target.remove();
+  });
+
+  it("sets host attributes", () => {
+    const widget = createIsolet({
+      name: "attr-test",
+      mount: () => {},
+      hostAttributes: { "data-custom": "value", role: "dialog" },
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    const host = target.querySelector("[data-isolet='attr-test']");
+    expect(host?.getAttribute("data-custom")).toBe("value");
+    expect(host?.getAttribute("role")).toBe("dialog");
+
+    widget.unmount();
+  });
+});
