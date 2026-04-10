@@ -1,6 +1,6 @@
 {
   "name": "isolet-js-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CLI for packaging components into isolated widgets",
   "type": "module",
   "bin": {
