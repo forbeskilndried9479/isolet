@@ -55,6 +55,8 @@ export const mountContainer = (
   }
 
   if (isolation === "shadow-dom") {
+    host.style.all = "initial";
+
     const shadowRoot = host.attachShadow({
       mode: options.shadowMode ?? "open",
     });
