@@ -16,14 +16,15 @@ npm install isolet-js
 
 The core API is one function: `createIsolet`. You give it a name, a mount function, and optionally some CSS. It gives you back `mount`, `update`, and `unmount`.
 
-```ts
+```tsx
 import { createIsolet } from "isolet-js";
+import { react } from "isolet-js/react";
+
+const Hello = ({ name }: { name: string }) => <h1>Hello, {name}!</h1>;
 
 const widget = createIsolet({
   name: "hello",
-  mount(container, props) {
-    container.innerHTML = `<h1>Hello, ${props.name}!</h1>`;
-  },
+  mount: react(Hello),
   css: `h1 { color: tomato; font-family: sans-serif; }`,
 });
 
