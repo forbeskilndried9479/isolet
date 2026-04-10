@@ -32,6 +32,30 @@ widget.mount(document.body, { name: "World" });
 
 The component renders inside a shadow DOM by default. Styles are scoped. Nothing leaks in or out.
 
+## CLI
+
+You can also distribute your component super easily. Point the CLI at an entry file and it'll bundle everything — component, styles, runtime — into a single drop-in artifact ready to ship as a script tag, ESM import, or CJS require.
+
+```sh
+npx isolet-js-cli init    # scaffold an isolet.config.ts
+npx isolet-js-cli build   # bundle widgets from config
+```
+
+The config file:
+
+```ts
+// isolet.config.ts
+import { defineConfig } from "isolet-js";
+
+export default defineConfig({
+  name: "my-widget",
+  entry: "./src/index.ts",
+  styles: "./src/widget.css",
+  format: ["iife", "esm"],
+  isolation: "shadow-dom",
+});
+```
+
 ## Framework adapters
 
 Adapters are thin wrappers that handle framework-specific mounting. The core doesn't import or depend on any framework.
@@ -165,28 +189,6 @@ The IIFE build exposes `globalThis.__ISOLET__`:
 
   widget.mount(document.body);
 </script>
-```
-
-## CLI
-
-```sh
-npx isolet-js-cli init    # scaffold an isolet.config.ts
-npx isolet-js-cli build   # bundle widgets from config
-```
-
-The config file:
-
-```ts
-// isolet.config.ts
-import { defineConfig } from "isolet-js";
-
-export default defineConfig({
-  name: "my-widget",
-  entry: "./src/index.ts",
-  styles: "./src/widget.css",
-  format: ["iife", "esm"],
-  isolation: "shadow-dom",
-});
 ```
 
 ## API
