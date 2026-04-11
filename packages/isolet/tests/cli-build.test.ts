@@ -73,20 +73,58 @@ describe("isolet build", () => {
     }
   });
 
-  it("inlines CSS url() references as data URIs", () => {
+  it("inlines CSS url() references as data URIs that decode to real SVG", () => {
     const files = fs.readdirSync(DIST_DIR);
     const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
     const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
 
-    expect(content).toContain("data:image/svg+xml,");
     expect(content).not.toContain("url(./icon.svg)");
+
+    const dataUriMatch = content.match(/data:image\/svg\+xml,([^"')\s]+)/);
+    expect(dataUriMatch).toBeTruthy();
+
+    const decoded = decodeURIComponent(dataUriMatch![1]!);
+    expect(decoded).toContain("<svg");
+    expect(decoded).toContain("<circle");
+    expect(decoded).toContain('fill="#e0e0e0"');
   });
 
-  it("inlines static asset imports as data URIs", () => {
+  it("inlines static asset imports as data URIs that decode to real SVG", () => {
     const files = fs.readdirSync(DIST_DIR);
     const esm = files.find((f) => f.endsWith(".js") && !f.includes("iife") && !f.includes("global"));
     const content = fs.readFileSync(resolve(DIST_DIR, esm!), "utf8");
 
-    expect(content).toContain("data:image/svg+xml,");
+    const dataUriMatch = content.match(/data:image\/svg\+xml,([^"')\s]+)/);
+    expect(dataUriMatch).toBeTruthy();
+
+    const decoded = decodeURIComponent(dataUriMatch![1]!);
+    expect(decoded).toContain("<svg");
+    expect(decoded).toContain("<circle");
+  });
+
+  it("bundle is fully self-contained (no external requires)", () => {
+    const files = fs.readdirSync(DIST_DIR);
+    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
+    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+
+    const externalRequires = content
+      .split("\n")
+      .filter(
+        (line) =>
+          /\brequire\s*\(\s*["'](?!\.)[^"']+["']\s*\)/.test(line) &&
+          !line.includes("__require"),
+      );
+    expect(externalRequires).toEqual([]);
+  });
+
+  it("CSS in bundle contains full stylesheet with all properties", () => {
+    const files = fs.readdirSync(DIST_DIR);
+    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
+    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+
+    expect(content).toContain(".widget");
+    expect(content).toContain(".widget-icon");
+    expect(content).toContain("background-image");
+    expect(content).toContain("padding");
   });
 });
