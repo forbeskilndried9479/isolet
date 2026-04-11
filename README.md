@@ -37,14 +37,16 @@ The component renders inside a shadow DOM by default. Styles are scoped. Nothing
 
 ## CLI
 
-You can also distribute your component super easily. Point the CLI at an entry file and it'll bundle everything — component, styles, runtime — into a single drop-in artifact ready to ship as a script tag, ESM import, or CJS require.
+Distribute your component as a self-contained bundle. The CLI reads your config, resolves CSS + assets, and outputs a drop-in artifact.
 
 ```sh
 npx isolet-js init    # scaffold an isolet.config.ts
-npx isolet-js build   # bundle widgets from config
+npx isolet-js build   # bundle widget(s) from config
+npx isolet-js build --watch   # rebuild on changes
+npx isolet-js build --minify  # minified production build
 ```
 
-The config file:
+### Config
 
 ```ts
 // isolet.config.ts
@@ -53,11 +55,34 @@ import { defineConfig } from "isolet-js";
 export default defineConfig({
   name: "my-widget",
   entry: "./src/index.ts",
-  styles: "./src/widget.css",
-  format: ["iife", "esm"],
-  // outDir: "./dist",  ← output goes here (default: "dist")
+  styles: "./src/widget.css",       // CSS to inline (url() assets auto-resolved)
+  format: ["iife", "esm"],          // output formats
+  // outDir: "./dist",              // output directory (default: "dist")
+  // globalName: "MyWidget",        // global name for IIFE builds
+  // external: ["react"],           // don't bundle these
+  // dts: true,                     // emit .d.ts files
+  // minify: true,                  // minify output
+  // platform: "browser",           // target platform (default: "browser")
 });
 ```
+
+You can also export an array for multiple widgets:
+
+```ts
+export default defineConfig([
+  { name: "widget-a", entry: "./src/a.ts", styles: "./src/a.css" },
+  { name: "widget-b", entry: "./src/b.ts", format: ["esm"] },
+]);
+```
+
+### What the build does
+
+- Reads `styles` from config, inlines all `url()` references (fonts, images) as data URIs
+- Makes processed CSS available as `__ISOLET_CSS__` in your entry code
+- Converts all `.css` imports to JS string exports (shadow DOM safe)
+- Inlines static asset imports (`.png`, `.woff2`, `.mp3`, etc.) as data URIs
+- Resolves `styles: "./path.css"` in `createIsolet`/`defineElement` calls at build time
+- Outputs IIFE (script tag), ESM, and/or CJS depending on `format`
 
 ## Framework adapters
 
