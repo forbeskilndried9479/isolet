@@ -151,21 +151,32 @@ createIsolet({
 });
 ```
 
-## CSS injection
+## CSS & asset handling
 
-Pass CSS as a string. In shadow DOM mode it's scoped to the shadow root. In other modes it's injected as a `<style>` tag.
+`isolet build` automatically handles CSS and assets — no manual plugin setup required:
+
+- **`styles` in config** → CSS files are read, all `url()` references (fonts, images) are inlined as data URIs, and the result is available as `__ISOLET_CSS__` in your entry
+- **`.css` imports** → converted to JS string exports (shadow DOM safe)
+- **Asset imports** (`.png`, `.woff2`, `.mp3`, etc.) → inlined as data URIs
+- **`styles: "./path.css"` in `createIsolet`/`defineElement`** → resolved and inlined at build time
 
 ```ts
-import styles from "./widget.css?raw";
-
+// Your entry file — just reference css, the CLI handles the rest
 createIsolet({
-  name: "styled-widget",
+  name: "my-widget",
+  css: __ISOLET_CSS__,  // injected by isolet build from config styles field
   mount: myMount,
-  css: styles,
+});
+
+// Or inline the path directly:
+createIsolet({
+  name: "my-widget",
+  styles: "./widget.css",  // auto-resolved at build time
+  mount: myMount,
 });
 ```
 
-For build-time CSS inlining, use the included plugins in your vite config:
+If you're using `vp pack` or Vite directly instead of the CLI, add the plugins manually:
 
 ```ts
 // vite.config.ts
