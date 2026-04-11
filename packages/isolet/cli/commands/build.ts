@@ -47,11 +47,7 @@ const wrapperEntryPlugin = (userEntry: string) => {
     },
     load(id: string) {
       if (id !== VIRTUAL_ENTRY_ID) return;
-      return [
-        `export * from ${JSON.stringify(userEntry)};`,
-        `import __mod from ${JSON.stringify(userEntry)};`,
-        `export default __mod;`,
-      ].join("\n");
+      return `export * from ${JSON.stringify(userEntry)};`;
     },
   };
 };
