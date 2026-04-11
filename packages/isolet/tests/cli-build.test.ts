@@ -63,12 +63,30 @@ describe("isolet build", () => {
     expect(content).toContain("BasicWidget");
   });
 
-  it("does not contain raw css file path in output", () => {
+  it("does not contain raw file paths in output", () => {
     const files = fs.readdirSync(DIST_DIR);
     for (const file of files) {
       if (!file.endsWith(".js")) continue;
       const content = fs.readFileSync(resolve(DIST_DIR, file), "utf8");
       expect(content).not.toContain("./src/styles.css");
+      expect(content).not.toContain("./icon.svg");
     }
+  });
+
+  it("inlines CSS url() references as data URIs", () => {
+    const files = fs.readdirSync(DIST_DIR);
+    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
+    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+
+    expect(content).toContain("data:image/svg+xml,");
+    expect(content).not.toContain("url(./icon.svg)");
+  });
+
+  it("inlines static asset imports as data URIs", () => {
+    const files = fs.readdirSync(DIST_DIR);
+    const esm = files.find((f) => f.endsWith(".js") && !f.includes("iife") && !f.includes("global"));
+    const content = fs.readFileSync(resolve(DIST_DIR, esm!), "utf8");
+
+    expect(content).toContain("data:image/svg+xml,");
   });
 });

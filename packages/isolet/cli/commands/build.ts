@@ -74,7 +74,7 @@ const toTsdownConfig = (
 
   if (cssText) {
     define["__ISOLET_CSS__"] = JSON.stringify(cssText);
-    plugins.push(wrapperEntryPlugin(userEntry));
+    plugins.push(wrapperEntryPlugin(userEntry) as any);
   }
 
   return {

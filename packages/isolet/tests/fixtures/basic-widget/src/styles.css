@@ -4,3 +4,9 @@
   background: #1a1a2e;
   color: #e0e0e0;
 }
+
+.widget-icon {
+  background-image: url(./icon.svg);
+  width: 16px;
+  height: 16px;
+}
