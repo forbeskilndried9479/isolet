@@ -7,7 +7,8 @@ export const detectCspNonce = (): string | undefined => {
   if (meta?.content) return meta.content;
 
   const script = document.querySelector<HTMLScriptElement>("script[nonce]");
-  if (script?.nonce) return script.nonce;
+  const nonce = script?.nonce || script?.getAttribute("nonce");
+  if (nonce) return nonce;
 
   return undefined;
 };

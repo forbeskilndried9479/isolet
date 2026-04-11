@@ -35,4 +35,34 @@ describe("injectStyles", () => {
     expect(shadow.contains(style)).toBe(true);
     expect(style.textContent).toBe("p { color: green; }");
   });
+
+  it("sets nonce from meta[name='csp-nonce']", () => {
+    const meta = document.createElement("meta");
+    meta.name = "csp-nonce";
+    meta.content = "test-nonce-123";
+    document.head.appendChild(meta);
+
+    const container = document.createElement("div");
+    const style = injectStyles("nonce-test", "a { color: red; }", container);
+
+    expect(style.getAttribute("nonce")).toBe("test-nonce-123");
+  });
+
+  it("sets nonce from script[nonce]", () => {
+    const script = document.createElement("script");
+    script.setAttribute("nonce", "script-nonce-456");
+    document.head.appendChild(script);
+
+    const container = document.createElement("div");
+    const style = injectStyles("nonce-script", "a { color: red; }", container);
+
+    expect(style.getAttribute("nonce")).toBe("script-nonce-456");
+  });
+
+  it("does not set nonce when none available", () => {
+    const container = document.createElement("div");
+    const style = injectStyles("no-nonce", "a { color: red; }", container);
+
+    expect(style.getAttribute("nonce")).toBeNull();
+  });
 });

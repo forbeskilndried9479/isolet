@@ -5,13 +5,14 @@ export const createIsolet = <P = unknown>(
   options: IsoletOptions<P>,
 ): IsoletInstance<P> => {
   let result: MountResult | null = null;
-  let cleanup: (() => void) | void;
+  let cleanup: (() => void) | undefined;
   let currentProps: P | undefined;
   let isMounted = false;
 
   const render = (props: P): void => {
     if (!result) return;
-    cleanup = options.mount(result.container, props);
+    const result_ = options.mount(result.container, props);
+    if (typeof result_ === "function") cleanup = result_;
   };
 
   const instance: IsoletInstance<P> = {

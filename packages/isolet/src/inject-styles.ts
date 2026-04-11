@@ -18,7 +18,7 @@ export const injectStyles = (
   const style = document.createElement("style");
   style.id = styleId;
   const nonce = detectCspNonce();
-  if (nonce) style.nonce = nonce;
+  if (nonce) style.setAttribute("nonce", nonce);
   style.textContent = css;
   target.appendChild(style);
   return style;
