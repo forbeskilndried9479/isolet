@@ -1,5 +1,5 @@
 import { defineConfig } from "vite-plus";
-import { cssTextPlugin } from "./plugins/css-text.js";
+import { cssTextPlugin, inlineAssetsPlugin } from "./plugins/index.js";
 
 export default defineConfig({
   pack: [
@@ -17,7 +17,7 @@ export default defineConfig({
           process.env.NODE_ENV ?? "development",
         ),
       },
-      plugins: [cssTextPlugin()],
+      plugins: [cssTextPlugin(), inlineAssetsPlugin()],
     },
     {
       entry: [
@@ -25,6 +25,10 @@ export default defineConfig({
         "./src/runtime.ts",
         "./src/adapters/react.ts",
         "./src/adapters/vanilla.ts",
+        "./src/adapters/solid.ts",
+        "./src/adapters/preact.ts",
+        "./src/adapters/vue.ts",
+        "./src/adapters/svelte.ts",
       ],
       format: ["cjs", "esm"],
       dts: true,
@@ -37,7 +41,24 @@ export default defineConfig({
           process.env.NODE_ENV ?? "development",
         ),
       },
-      plugins: [cssTextPlugin()],
+      plugins: [cssTextPlugin(), inlineAssetsPlugin()],
+    },
+    {
+      entry: ["./plugins/index.ts"],
+      format: ["cjs", "esm"],
+      dts: true,
+      clean: false,
+      platform: "node",
+      sourcemap: false,
+    },
+    {
+      entry: ["./cli/cli.ts"],
+      format: ["esm"],
+      dts: false,
+      clean: false,
+      platform: "node",
+      sourcemap: false,
+      banner: "#!/usr/bin/env node",
     },
   ],
 });

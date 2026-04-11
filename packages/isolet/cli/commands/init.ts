@@ -9,7 +9,7 @@ interface InitOptions {
   cwd: string;
 }
 
-const DEFAULT_CONFIG = `import { defineConfig } from "isolet";
+const DEFAULT_CONFIG = `import { defineConfig } from "isolet-js";
 
 export default defineConfig({
   name: "my-widget",
@@ -98,7 +98,7 @@ export const init = async (options: InitOptions) => {
         ? `\n  isolation: "${answers.isolation}",`
         : "";
 
-    config = `import { defineConfig } from "isolet";
+    config = `import { defineConfig } from "isolet-js";
 
 export default defineConfig({
   name: "${answers.name}",

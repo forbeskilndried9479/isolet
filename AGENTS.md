@@ -6,8 +6,7 @@ isolet packages any component into a self-contained widget with configurable iso
 
 ## Packages
 
-- `packages/isolet`: core runtime (createIsolet, mountContainer, adapters)
-- `packages/cli`: CLI tool (`isolet init`, `isolet build`)
+- `packages/isolet`: core runtime, adapters, build plugins, and CLI (single package: `isolet-js`)
 
 ## Code style
 

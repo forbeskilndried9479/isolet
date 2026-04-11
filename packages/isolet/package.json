@@ -3,6 +3,9 @@
   "version": "0.0.3",
   "description": "Package components into self-contained, isolated widgets",
   "type": "module",
+  "bin": {
+    "isolet": "./dist/cli.mjs"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -47,6 +50,56 @@
         "default": "./dist/adapters/vanilla.cjs"
       }
     },
+    "./solid": {
+      "import": {
+        "types": "./dist/adapters/solid.d.ts",
+        "default": "./dist/adapters/solid.js"
+      },
+      "require": {
+        "types": "./dist/adapters/solid.d.cts",
+        "default": "./dist/adapters/solid.cjs"
+      }
+    },
+    "./preact": {
+      "import": {
+        "types": "./dist/adapters/preact.d.ts",
+        "default": "./dist/adapters/preact.js"
+      },
+      "require": {
+        "types": "./dist/adapters/preact.d.cts",
+        "default": "./dist/adapters/preact.cjs"
+      }
+    },
+    "./vue": {
+      "import": {
+        "types": "./dist/adapters/vue.d.ts",
+        "default": "./dist/adapters/vue.js"
+      },
+      "require": {
+        "types": "./dist/adapters/vue.d.cts",
+        "default": "./dist/adapters/vue.cjs"
+      }
+    },
+    "./svelte": {
+      "import": {
+        "types": "./dist/adapters/svelte.d.ts",
+        "default": "./dist/adapters/svelte.js"
+      },
+      "require": {
+        "types": "./dist/adapters/svelte.d.cts",
+        "default": "./dist/adapters/svelte.cjs"
+      }
+    },
+    "./plugins": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
     "./global": "./dist/index.iife.js"
   },
   "files": [
@@ -59,8 +112,12 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "preact": ">=10",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "solid-js": ">=1.0.0",
+    "svelte": ">=5",
+    "vue": ">=3"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -68,15 +125,38 @@
     },
     "react-dom": {
       "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "preact": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@types/prompts": "^2.4.9",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "happy-dom": "^20.8.9",
+    "preact": "^10.29.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.16"
+    "solid-js": "^1.9.12",
+    "svelte": "^5.55.3",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@^0.1.16",
+    "vue": "^3.5.32"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.3",
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2",
+    "tsdown": "^0.21.7"
+  }
 }

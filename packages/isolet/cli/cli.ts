@@ -1,13 +1,21 @@
+import fs from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { init } from "./commands/init.js";
 import { build } from "./commands/build.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  fs.readFileSync(resolve(__dirname, "..", "package.json"), "utf8"),
+) as { version: string };
 
 const program = new Command();
 
 program
   .name("isolet")
   .description("Package components into self-contained, isolated widgets")
-  .version("0.0.1");
+  .version(pkg.version);
 
 program
   .command("init")

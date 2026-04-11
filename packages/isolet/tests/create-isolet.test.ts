@@ -170,4 +170,89 @@ describe("createIsolet", () => {
 
     widget.unmount();
   });
+
+  it("applies hostStyles after shadow DOM reset", () => {
+    const widget = createIsolet({
+      name: "styles-test",
+      mount: () => {},
+      hostStyles: {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        pointerEvents: "none",
+      },
+      zIndex: "2147483647",
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    const host = target.querySelector<HTMLElement>(
+      "[data-isolet='styles-test']",
+    );
+    expect(host?.style.position).toBe("fixed");
+    expect(host?.style.top).toBe("0px");
+    expect(host?.style.left).toBe("0px");
+    expect(host?.style.pointerEvents).toBe("none");
+    expect(host?.style.zIndex).toBe("2147483647");
+
+    widget.unmount();
+  });
+
+  it("exposes host element on instance", () => {
+    const widget = createIsolet({
+      name: "host-access-test",
+      mount: () => {},
+    });
+
+    expect(widget.host).toBeNull();
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    expect(widget.host).toBeInstanceOf(HTMLElement);
+    expect(widget.host?.getAttribute("data-isolet")).toBe("host-access-test");
+
+    widget.unmount();
+    expect(widget.host).toBeNull();
+  });
+
+  it("host is null in none mode", () => {
+    const widget = createIsolet({
+      name: "none-host-test",
+      mount: () => {},
+      isolation: "none",
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    expect(widget.host).toBeNull();
+    expect(widget.container).toBe(target);
+
+    widget.unmount();
+  });
+
+  it("applies hostStyles in scoped mode", () => {
+    const widget = createIsolet({
+      name: "scoped-styles-test",
+      mount: () => {},
+      isolation: "scoped",
+      hostStyles: {
+        position: "fixed",
+        pointerEvents: "none",
+      },
+    });
+
+    const target = document.createElement("div");
+    widget.mount(target);
+
+    const host = target.querySelector<HTMLElement>(
+      "[data-isolet='scoped-styles-test']",
+    );
+    expect(host?.style.position).toBe("fixed");
+    expect(host?.style.pointerEvents).toBe("none");
+
+    widget.unmount();
+  });
 });

@@ -18,8 +18,7 @@ Takes a component (React, Solid, Svelte, vanilla, anything) + its styles, bundle
 
 ## Packages
 
-- `packages/isolet`: core runtime (`createIsolet`, `mountContainer`, adapters) + `defineConfig` for config files
-- `packages/cli`: CLI tool (`isolet init`, `isolet build`)
+- `packages/isolet`: core runtime, adapters, build plugins, and CLI (single package: `isolet-js`)
 - `apps/`: demo/test apps
 
 ## CLI
@@ -33,11 +32,12 @@ isolet build --watch # watch mode
 ## Key source files
 
 - `packages/isolet/src/create-isolet.ts`: core factory, framework-agnostic
-- `packages/isolet/src/mount-shadow-root.ts`: container creation (shadow-dom, scoped, none)
+- `packages/isolet/src/mount-container.ts`: container creation (shadow-dom, scoped, none)
+- `packages/isolet/src/define-element.ts`: web component registration
 - `packages/isolet/src/inject-styles.ts`: style injection with CSP nonce support
-- `packages/isolet/src/adapters/react.ts`: React adapter
-- `packages/isolet/src/adapters/vanilla.ts`: vanilla DOM adapter
-- `packages/isolet/plugins/css-text.ts`: rollup plugin, CSS to JS strings
+- `packages/isolet/src/adapters/`: framework adapters (react, preact, solid, vue, svelte, vanilla)
+- `packages/isolet/plugins/index.ts`: build plugins (css-text, inline-assets, auto-styles)
+- `packages/isolet/cli/`: CLI commands (init, build)
 
 ## Commands
 

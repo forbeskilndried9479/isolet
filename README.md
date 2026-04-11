@@ -38,8 +38,8 @@ The component renders inside a shadow DOM by default. Styles are scoped. Nothing
 You can also distribute your component super easily. Point the CLI at an entry file and it'll bundle everything — component, styles, runtime — into a single drop-in artifact ready to ship as a script tag, ESM import, or CJS require.
 
 ```sh
-npx isolet-js-cli init    # scaffold an isolet.config.ts
-npx isolet-js-cli build   # bundle widgets from config
+npx isolet-js init    # scaffold an isolet.config.ts
+npx isolet-js build   # bundle widgets from config
 ```
 
 The config file:

@@ -16,6 +16,7 @@ export const mountContainer = (
     css?: string;
     shadowMode?: ShadowRootMode;
     hostAttributes?: Record<string, string>;
+    hostStyles?: Partial<CSSStyleDeclaration>;
     zIndex?: string | number;
   } = {},
 ): MountResult => {
@@ -50,10 +51,6 @@ export const mountContainer = (
     }
   }
 
-  if (options.zIndex != null) {
-    host.style.zIndex = String(options.zIndex);
-  }
-
   if (isolation === "shadow-dom") {
     host.style.all = "initial";
 
@@ -67,11 +64,35 @@ export const mountContainer = (
     container.setAttribute(`${ATTRIBUTE_NAME}-root`, "");
     shadowRoot.appendChild(container);
 
+    applyHostStyles(host, options);
     target.appendChild(host);
     return { host, shadowRoot, container };
   }
 
+  applyHostStyles(host, options);
   if (options.css) injectStyles(name, options.css, target);
   target.appendChild(host);
   return { host, shadowRoot: null, container: host };
+};
+
+const applyHostStyles = (
+  host: HTMLElement,
+  options: {
+    hostStyles?: Partial<CSSStyleDeclaration>;
+    zIndex?: string | number;
+  },
+): void => {
+  if (options.hostStyles) {
+    for (const [prop, value] of Object.entries(options.hostStyles)) {
+      if (value == null || typeof value === "function") continue;
+      host.style.setProperty(
+        prop.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`),
+        String(value),
+      );
+    }
+  }
+
+  if (options.zIndex != null) {
+    host.style.zIndex = String(options.zIndex);
+  }
 };

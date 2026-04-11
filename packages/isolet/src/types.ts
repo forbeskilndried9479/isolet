@@ -29,6 +29,14 @@ export interface IsoletOptions<P = unknown> {
   css?: string;
 
   /**
+   * Path to a CSS file (or array of paths) to inline at build time.
+   * Requires the `autoStylesPlugin` in your build config.
+   * The plugin resolves the path, inlines url() assets, and replaces
+   * this field with `css` in the build output.
+   */
+  styles?: string | string[];
+
+  /**
    * Isolation strategy. Defaults to "shadow-dom".
    */
   isolation?: IsolationMode;
@@ -44,6 +52,13 @@ export interface IsoletOptions<P = unknown> {
    * Does not apply when isolation is "none".
    */
   hostAttributes?: Record<string, string>;
+
+  /**
+   * Inline styles to set on the host element.
+   * Applied after the style reset in shadow-dom mode, so these override `all: initial`.
+   * Does not apply when isolation is "none".
+   */
+  hostStyles?: Partial<CSSStyleDeclaration>;
 
   /**
    * z-index for the host element.
@@ -68,6 +83,11 @@ export interface IsoletInstance<P = unknown> {
    * Unmount and clean up the isolet.
    */
   unmount: () => void;
+
+  /**
+   * The outer host element (available after mount, null in "none" mode).
+   */
+  readonly host: HTMLElement | null;
 
   /**
    * The container element the component renders into (available after mount).

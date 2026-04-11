@@ -24,6 +24,7 @@ export const createIsolet = <P = unknown>(
         css: options.css,
         shadowMode: options.shadowMode,
         hostAttributes: options.hostAttributes,
+        hostStyles: options.hostStyles,
         zIndex: options.zIndex,
       });
 
@@ -45,13 +46,20 @@ export const createIsolet = <P = unknown>(
 
       if (result?.host) {
         result.host.remove();
-      } else if (result?.container) {
-        result.container.innerHTML = "";
       }
+
+      const injectedStyle = (result?.container ?? document).querySelector(
+        `#isolet-style-${CSS.escape(options.name)}`,
+      );
+      if (injectedStyle) injectedStyle.remove();
 
       result = null;
       currentProps = undefined;
       isMounted = false;
+    },
+
+    get host() {
+      return result?.host ?? null;
     },
 
     get container() {
