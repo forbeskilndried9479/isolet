@@ -1,6 +1,6 @@
 {
   "name": "isolet-js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Package components into self-contained, isolated widgets",
   "type": "module",
   "bin": {
