@@ -165,11 +165,11 @@ createIsolet({
 });
 ```
 
-For build-time CSS inlining, use the included css-text plugin in your vite config:
+For build-time CSS inlining, use the included plugins in your vite config:
 
 ```ts
 // vite.config.ts
-import { cssTextPlugin } from "isolet-js/plugins/css-text";
+import { cssTextPlugin, inlineAssetsPlugin, autoStylesPlugin } from "isolet-js/plugins";
 ```
 
 ## Script tag usage

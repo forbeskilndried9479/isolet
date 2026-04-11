@@ -154,6 +154,48 @@ describe("createIsolet", () => {
     target.remove();
   });
 
+  it("removes injected style on scoped unmount", () => {
+    const css = ".x { color: red; }";
+    const widget = createIsolet({
+      name: "scoped-style-cleanup",
+      mount: () => {},
+      css,
+      isolation: "scoped",
+    });
+
+    const target = document.createElement("div");
+    document.body.appendChild(target);
+    widget.mount(target);
+
+    expect(target.querySelector("#isolet-style-scoped-style-cleanup")).toBeTruthy();
+
+    widget.unmount();
+    expect(target.querySelector("#isolet-style-scoped-style-cleanup")).toBeNull();
+
+    target.remove();
+  });
+
+  it("removes injected style on none-mode unmount", () => {
+    const css = ".y { color: blue; }";
+    const widget = createIsolet({
+      name: "none-style-cleanup",
+      mount: () => {},
+      css,
+      isolation: "none",
+    });
+
+    const target = document.createElement("div");
+    document.body.appendChild(target);
+    widget.mount(target);
+
+    expect(target.querySelector("#isolet-style-none-style-cleanup")).toBeTruthy();
+
+    widget.unmount();
+    expect(target.querySelector("#isolet-style-none-style-cleanup")).toBeNull();
+
+    target.remove();
+  });
+
   it("sets host attributes", () => {
     const widget = createIsolet({
       name: "attr-test",

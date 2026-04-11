@@ -47,9 +47,8 @@ export const defineElement = <P extends Record<string, unknown>>(
     return attrs as unknown as P;
   };
 
-  if (customElements.get(tagName)) {
-    return customElements.get(tagName)!;
-  }
+  const existing = customElements.get(tagName);
+  if (existing) return existing;
 
   class IsoletElement extends HTMLElement {
     static get observedAttributes(): string[] {

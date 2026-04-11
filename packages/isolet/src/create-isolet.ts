@@ -48,7 +48,8 @@ export const createIsolet = <P = unknown>(
         result.host.remove();
       }
 
-      const injectedStyle = (result?.container ?? document).querySelector(
+      const styleRoot = result?.target ?? document;
+      const injectedStyle = styleRoot.querySelector(
         `#isolet-style-${CSS.escape(options.name)}`,
       );
       if (injectedStyle) injectedStyle.remove();

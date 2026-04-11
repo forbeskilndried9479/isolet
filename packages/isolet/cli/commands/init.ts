@@ -62,17 +62,6 @@ export const init = async (options: InitOptions) => {
         initial: "",
       },
       {
-        type: "select",
-        name: "isolation",
-        message: "Isolation strategy",
-        choices: [
-          { title: "Shadow DOM (full CSS isolation)", value: "shadow-dom" },
-          { title: "Scoped (plain div, global styles)", value: "scoped" },
-          { title: "None (mount directly into target)", value: "none" },
-        ],
-        initial: 0,
-      },
-      {
         type: "multiselect",
         name: "format",
         message: "Output formats",
@@ -93,16 +82,12 @@ export const init = async (options: InitOptions) => {
     const stylesLine = answers.styles
       ? `\n  styles: "${answers.styles}",`
       : "";
-    const isolationLine =
-      answers.isolation !== "shadow-dom"
-        ? `\n  isolation: "${answers.isolation}",`
-        : "";
 
     config = `import { defineConfig } from "isolet-js";
 
 export default defineConfig({
   name: "${answers.name}",
-  entry: "${answers.entry}",${stylesLine}${isolationLine}
+  entry: "${answers.entry}",${stylesLine}
   format: [${formats}],
 });
 `;

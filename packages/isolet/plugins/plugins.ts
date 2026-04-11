@@ -160,7 +160,12 @@ export const autoStylesPlugin = () => {
     enforce: "pre" as const,
     transform(code: string, id: string) {
       if (!/\.[jt]sx?$/.test(id)) return;
-      if (!code.includes("styles")) return;
+      if (
+        !code.includes("createIsolet") &&
+        !code.includes("defineElement")
+      ) {
+        return;
+      }
 
       const fileDir = dirname(id);
       let result = code;

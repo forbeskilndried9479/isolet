@@ -6,7 +6,7 @@ import {
   inlineAssetsPlugin,
   autoStylesPlugin,
   processCss,
-} from "../../plugins/index.js";
+} from "../../plugins/plugins.js";
 import { loadConfig, type IsoletConfig } from "../utils/config.js";
 import { log } from "../utils/logger.js";
 
@@ -39,11 +39,7 @@ const resolveStyles = (
 
 const VIRTUAL_ENTRY_ID = "\0isolet-entry";
 
-const wrapperEntryPlugin = (
-  userEntry: string,
-  cssText: string,
-  widgetName: string,
-) => {
+const wrapperEntryPlugin = (userEntry: string) => {
   return {
     name: "isolet-wrapper-entry",
     resolveId(source: string) {
@@ -52,15 +48,9 @@ const wrapperEntryPlugin = (
     load(id: string) {
       if (id !== VIRTUAL_ENTRY_ID) return;
       return [
-        `import { createIsolet, mountContainer, injectStyles } from "isolet-js/runtime";`,
         `export * from ${JSON.stringify(userEntry)};`,
         `import __mod from ${JSON.stringify(userEntry)};`,
         `export default __mod;`,
-        ``,
-        `if (typeof globalThis !== "undefined") {`,
-        `  globalThis.__ISOLET_STYLES__ = globalThis.__ISOLET_STYLES__ || {};`,
-        `  globalThis.__ISOLET_STYLES__[${JSON.stringify(widgetName)}] = ${JSON.stringify(cssText)};`,
-        `}`,
       ].join("\n");
     },
   };
@@ -88,7 +78,7 @@ const toTsdownConfig = (
 
   if (cssText) {
     define["__ISOLET_CSS__"] = JSON.stringify(cssText);
-    plugins.push(wrapperEntryPlugin(userEntry, cssText, config.name));
+    plugins.push(wrapperEntryPlugin(userEntry));
   }
 
   return {

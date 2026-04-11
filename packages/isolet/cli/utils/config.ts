@@ -8,11 +8,7 @@ export interface IsoletConfig {
   outDir?: string;
   format?: ("iife" | "esm" | "cjs")[];
   globalName?: string;
-  isolation?: "shadow-dom" | "scoped" | "none";
-  shadowMode?: "open" | "closed";
-  hostAttributes?: Record<string, string>;
   external?: string[];
-  bundle?: string[];
   dts?: boolean;
   minify?: boolean;
   platform?: "browser" | "node" | "neutral";
@@ -45,7 +41,11 @@ export const loadConfig = async (
 
   if (configPath.endsWith(".json")) {
     const content = fs.readFileSync(configPath, "utf8");
-    return JSON.parse(content) as IsoletConfig;
+    try {
+      return JSON.parse(content) as IsoletConfig;
+    } catch {
+      throw new Error(`Invalid JSON in ${configPath}`);
+    }
   }
 
   const mod = await import(configPath);

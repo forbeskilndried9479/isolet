@@ -6,6 +6,7 @@ export interface MountResult {
   host: HTMLElement | null;
   shadowRoot: ShadowRoot | null;
   container: HTMLElement;
+  target: HTMLElement;
 }
 
 export const mountContainer = (
@@ -24,7 +25,7 @@ export const mountContainer = (
 
   if (isolation === "none") {
     if (options.css) injectStyles(name, options.css, target);
-    return { host: null, shadowRoot: null, container: target };
+    return { host: null, shadowRoot: null, container: target, target };
   }
 
   const selector = `[${ATTRIBUTE_NAME}="${name}"]`;
@@ -35,10 +36,10 @@ export const mountContainer = (
         `[${ATTRIBUTE_NAME}-root]`,
       );
       if (container) {
-        return { host: existing, shadowRoot: existing.shadowRoot, container };
+        return { host: existing, shadowRoot: existing.shadowRoot, container, target };
       }
     } else if (isolation === "scoped") {
-      return { host: existing, shadowRoot: null, container: existing };
+      return { host: existing, shadowRoot: null, container: existing, target };
     }
   }
 
@@ -66,13 +67,13 @@ export const mountContainer = (
 
     applyHostStyles(host, options);
     target.appendChild(host);
-    return { host, shadowRoot, container };
+    return { host, shadowRoot, container, target };
   }
 
   applyHostStyles(host, options);
   if (options.css) injectStyles(name, options.css, target);
   target.appendChild(host);
-  return { host, shadowRoot: null, container: host };
+  return { host, shadowRoot: null, container: host, target };
 };
 
 const applyHostStyles = (

@@ -1,5 +1,5 @@
 import { defineConfig } from "vite-plus";
-import { cssTextPlugin, inlineAssetsPlugin } from "./plugins/index.js";
+import { cssTextPlugin, inlineAssetsPlugin } from "./plugins/plugins.js";
 
 export default defineConfig({
   pack: [
@@ -44,7 +44,7 @@ export default defineConfig({
       plugins: [cssTextPlugin(), inlineAssetsPlugin()],
     },
     {
-      entry: ["./plugins/index.ts"],
+      entry: ["./plugins/plugins.ts"],
       format: ["cjs", "esm"],
       dts: true,
       clean: false,
