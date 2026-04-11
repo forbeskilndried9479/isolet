@@ -53,7 +53,7 @@ export default defineConfig({
   entry: "./src/index.ts",
   styles: "./src/widget.css",
   format: ["iife", "esm"],
-  isolation: "shadow-dom",
+  // outDir: "./dist",  ← output goes here (default: "dist")
 });
 ```
 
