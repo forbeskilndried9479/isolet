@@ -20,7 +20,9 @@ The core API is one function: `createIsolet`. You give it a name, a mount functi
 import { createIsolet } from "isolet-js";
 import { react } from "isolet-js/react";
 
-const Hello = ({ name }: { name: string }) => <h1>Hello, {name}!</h1>;
+function Hello({ name }: { name: string }) {
+  return <h1>Hello, {name}!</h1>;
+}
 
 const widget = createIsolet({
   name: "hello",
