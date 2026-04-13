@@ -64,7 +64,7 @@ describe("createIsolet", () => {
     widget.unmount();
   });
 
-  it("mounts in none mode directly into target", () => {
+  it("mounts in none mode into a wrapper inside target", () => {
     const mount = vi.fn();
     const widget = createIsolet({
       name: "none-test",
@@ -77,8 +77,10 @@ describe("createIsolet", () => {
 
     expect(widget.mounted).toBe(true);
     expect(widget.shadowRoot).toBeNull();
-    expect(widget.container).toBe(target);
-    expect(mount).toHaveBeenCalledWith(target, {});
+    expect(widget.host).toBeInstanceOf(HTMLElement);
+    expect(widget.container).toBe(widget.host);
+    expect(widget.container).not.toBe(target);
+    expect(mount).toHaveBeenCalledWith(widget.container, {});
 
     widget.unmount();
   });
@@ -259,7 +261,7 @@ describe("createIsolet", () => {
     expect(widget.host).toBeNull();
   });
 
-  it("host is null in none mode", () => {
+  it("host is a wrapper div in none mode", () => {
     const widget = createIsolet({
       name: "none-host-test",
       mount: () => {},
@@ -269,10 +271,12 @@ describe("createIsolet", () => {
     const target = document.createElement("div");
     widget.mount(target);
 
-    expect(widget.host).toBeNull();
-    expect(widget.container).toBe(target);
+    expect(widget.host).toBeInstanceOf(HTMLElement);
+    expect(widget.host?.getAttribute("data-isolet")).toBe("none-host-test");
+    expect(widget.container).toBe(widget.host);
 
     widget.unmount();
+    expect(widget.host).toBeNull();
   });
 
   it("applies hostStyles in scoped mode", () => {

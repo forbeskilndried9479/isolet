@@ -3,7 +3,7 @@
  *
  * - "shadow-dom": Full isolation via shadow DOM (default)
  * - "scoped": Renders into a plain div (no shadow DOM, styles apply globally)
- * - "none": No wrapper at all -mounts directly into the target
+ * - "none": No style isolation — renders into a plain wrapper div inside the target
  */
 export type IsolationMode = "shadow-dom" | "scoped" | "none";
 
@@ -49,20 +49,17 @@ export interface IsoletOptions<P = unknown> {
 
   /**
    * Custom attributes to set on the host element.
-   * Does not apply when isolation is "none".
    */
   hostAttributes?: Record<string, string>;
 
   /**
    * Inline styles to set on the host element.
    * Applied after the style reset in shadow-dom mode, so these override `all: initial`.
-   * Does not apply when isolation is "none".
    */
   hostStyles?: Partial<CSSStyleDeclaration>;
 
   /**
    * z-index for the host element.
-   * Does not apply when isolation is "none".
    */
   zIndex?: string | number;
 }
@@ -85,7 +82,7 @@ export interface IsoletInstance<P = unknown> {
   unmount: () => void;
 
   /**
-   * The outer host element (available after mount, null in "none" mode).
+   * The outer host element (available after mount).
    */
   readonly host: HTMLElement | null;
 

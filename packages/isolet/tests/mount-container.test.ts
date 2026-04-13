@@ -39,14 +39,26 @@ describe("mountContainer", () => {
     expect(second.container).toBe(first.container);
   });
 
-  it("none mode returns target as container", () => {
+  it("none mode creates a wrapper div inside target", () => {
     const target = document.createElement("div");
     const result = mountContainer("none", target, { isolation: "none" });
 
-    expect(result.host).toBeNull();
+    expect(result.host).toBeInstanceOf(HTMLElement);
+    expect(result.host?.getAttribute("data-isolet")).toBe("none");
     expect(result.shadowRoot).toBeNull();
-    expect(result.container).toBe(target);
+    expect(result.container).toBe(result.host);
+    expect(result.container).not.toBe(target);
     expect(result.target).toBe(target);
+    expect(target.contains(result.host)).toBe(true);
+  });
+
+  it("none mode reuses existing host", () => {
+    const target = document.createElement("div");
+    const first = mountContainer("reuse-none", target, { isolation: "none" });
+    const second = mountContainer("reuse-none", target, { isolation: "none" });
+
+    expect(second.host).toBe(first.host);
+    expect(second.container).toBe(first.container);
   });
 
   it("injects CSS into shadow root", () => {

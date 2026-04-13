@@ -28,8 +28,25 @@ export const mountContainer = (
   const isolation = options.isolation ?? "shadow-dom";
 
   if (isolation === "none") {
+    const selector = `[${ATTRIBUTE_NAME}="${name}"]`;
+    const existing = target.querySelector<HTMLElement>(selector);
+    if (existing) {
+      return { host: existing, shadowRoot: null, container: existing, target };
+    }
+
+    const host = document.createElement("div");
+    host.setAttribute(ATTRIBUTE_NAME, name);
+
+    if (options.hostAttributes) {
+      for (const [key, value] of Object.entries(options.hostAttributes)) {
+        host.setAttribute(key, value);
+      }
+    }
+
+    applyHostStyles(host, options);
     if (options.css) injectStyles(name, options.css, target);
-    return { host: null, shadowRoot: null, container: target, target };
+    target.appendChild(host);
+    return { host, shadowRoot: null, container: host, target };
   }
 
   const selector = `[${ATTRIBUTE_NAME}="${name}"]`;
