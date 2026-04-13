@@ -33,7 +33,11 @@ export interface DefineElementOptions<P = unknown>
 export const defineElement = <P extends Record<string, unknown>>(
   tagName: string,
   options: DefineElementOptions<P>,
-): CustomElementConstructor => {
+): CustomElementConstructor | undefined => {
+  if (typeof customElements === "undefined" || typeof HTMLElement === "undefined") {
+    return undefined;
+  }
+
   const observed = options.observedAttributes ?? [];
 
   const getProps = (el: HTMLElement): P => {

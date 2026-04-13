@@ -21,6 +21,10 @@ export const mountContainer = (
     zIndex?: string | number;
   } = {},
 ): MountResult => {
+  if (typeof document === "undefined") {
+    return { host: null, shadowRoot: null, container: target, target };
+  }
+
   const isolation = options.isolation ?? "shadow-dom";
 
   if (isolation === "none") {

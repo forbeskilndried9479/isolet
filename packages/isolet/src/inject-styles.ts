@@ -4,12 +4,18 @@ export const injectStyles = (
   id: string,
   css: string,
   target: HTMLElement | ShadowRoot,
-): HTMLStyleElement => {
+): HTMLStyleElement | null => {
+  if (typeof document === "undefined") return null;
+
   const styleId = `isolet-style-${id}`;
+  const escapedId =
+    typeof CSS !== "undefined" && CSS.escape
+      ? CSS.escape(styleId)
+      : styleId;
 
   const existing = ("getElementById" in target
     ? (target as unknown as Document).getElementById(styleId)
-    : target.querySelector(`#${CSS.escape(styleId)}`)) as HTMLStyleElement | null;
+    : target.querySelector(`#${escapedId}`)) as HTMLStyleElement | null;
   if (existing) {
     existing.textContent = css;
     return existing;

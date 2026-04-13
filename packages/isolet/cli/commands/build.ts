@@ -7,7 +7,7 @@ import {
   autoStylesPlugin,
   processCss,
 } from "../../plugins/plugins.js";
-import { loadConfig, type IsoletConfig } from "../utils/config.js";
+import { loadConfig, type IsoletBuildConfig } from "../utils/config.js";
 import { log } from "../utils/logger.js";
 
 interface BuildOptions {
@@ -17,7 +17,7 @@ interface BuildOptions {
 }
 
 const resolveStyles = (
-  config: IsoletConfig,
+  config: IsoletBuildConfig,
   cwd: string,
 ): string | undefined => {
   if (!config.styles) return undefined;
@@ -70,13 +70,14 @@ const wrapperEntryPlugin = (userEntry: string, autoMount: boolean = false) => {
 };
 
 const toTsdownConfigs = (
-  config: IsoletConfig,
+  config: IsoletBuildConfig,
   cwd: string,
   overrides: { watch?: boolean; minify?: boolean },
 ): UserConfig[] => {
   const outDir = resolve(cwd, config.outDir ?? "dist");
   const formats = config.format ?? ["iife", "esm"];
   const minify = overrides.minify ?? config.minify ?? false;
+  const watch = overrides.watch ?? false;
   const cssText = resolveStyles(config, cwd);
   const userEntry = resolve(cwd, config.entry);
   const autoMount = config.autoMount !== false;
@@ -101,6 +102,7 @@ const toTsdownConfigs = (
     external: config.external,
     dts: config.dts ?? false,
     minify,
+    watch,
     platform: (config.platform ?? "browser") as UserConfig["platform"],
     clean: false,
     define,
@@ -160,7 +162,7 @@ const toTsdownConfigs = (
 export const build = async (options: BuildOptions) => {
   const cwd = resolve(options.cwd);
 
-  let configs: IsoletConfig[];
+  let configs: IsoletBuildConfig[];
   try {
     const loaded = await loadConfig(cwd);
     configs = Array.isArray(loaded) ? loaded : [loaded];

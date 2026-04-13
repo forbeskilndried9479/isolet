@@ -18,6 +18,7 @@ export const createIsolet = <P = unknown>(
   const instance: IsoletInstance<P> = {
     mount(target?: HTMLElement, props?: P) {
       if (isMounted) return;
+      if (typeof document === "undefined") return;
 
       const mountTarget = target ?? document.body;
       result = mountContainer(options.name, mountTarget, {
@@ -49,11 +50,17 @@ export const createIsolet = <P = unknown>(
         result.host.remove();
       }
 
-      const styleRoot = result?.target ?? document;
-      const injectedStyle = styleRoot.querySelector(
-        `#isolet-style-${CSS.escape(options.name)}`,
-      );
-      if (injectedStyle) injectedStyle.remove();
+      if (typeof document !== "undefined") {
+        const styleRoot = result?.target ?? document;
+        const escapedName =
+          typeof CSS !== "undefined" && CSS.escape
+            ? CSS.escape(options.name)
+            : options.name;
+        const injectedStyle = styleRoot.querySelector(
+          `#isolet-style-${escapedName}`,
+        );
+        if (injectedStyle) injectedStyle.remove();
+      }
 
       result = null;
       currentProps = undefined;

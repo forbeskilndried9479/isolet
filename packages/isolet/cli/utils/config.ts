@@ -1,27 +1,13 @@
 import fs from "node:fs";
 import { resolve } from "node:path";
+import { createJiti } from "jiti";
+import type { IsoletBuildConfig } from "../../src/define-config.js";
 
-export interface IsoletConfig {
-  name: string;
-  entry: string;
-  styles?: string | string[];
-  outDir?: string;
-  format?: ("iife" | "esm" | "cjs")[];
-  globalName?: string;
-  external?: string[];
-  dts?: boolean;
-  minify?: boolean;
-  platform?: "browser" | "node" | "neutral";
-  /**
-   * Auto-mount exported isolet instances to `document.documentElement`
-   * when loading the IIFE bundle. Defaults to `true`.
-   * Only affects IIFE output; ESM/CJS exports are not auto-mounted.
-   */
-  autoMount?: boolean;
-}
+export type { IsoletBuildConfig };
 
 const CONFIG_FILES = [
   "isolet.config.ts",
+  "isolet.config.mts",
   "isolet.config.js",
   "isolet.config.mjs",
   "isolet.config.json",
@@ -37,7 +23,7 @@ export const findConfig = (cwd: string): string | null => {
 
 export const loadConfig = async (
   cwd: string,
-): Promise<IsoletConfig | IsoletConfig[]> => {
+): Promise<IsoletBuildConfig | IsoletBuildConfig[]> => {
   const configPath = findConfig(cwd);
   if (!configPath) {
     throw new Error(
@@ -48,12 +34,15 @@ export const loadConfig = async (
   if (configPath.endsWith(".json")) {
     const content = fs.readFileSync(configPath, "utf8");
     try {
-      return JSON.parse(content) as IsoletConfig;
+      return JSON.parse(content) as IsoletBuildConfig;
     } catch {
       throw new Error(`Invalid JSON in ${configPath}`);
     }
   }
 
-  const mod = await import(configPath);
-  return mod.default as IsoletConfig | IsoletConfig[];
+  const jiti = createJiti(configPath, { interopDefault: true });
+  const mod = (await jiti.import(configPath)) as
+    | IsoletBuildConfig
+    | IsoletBuildConfig[];
+  return mod;
 };
