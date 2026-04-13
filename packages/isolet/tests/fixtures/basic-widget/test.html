@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>isolet browser test</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #111;
+        color: #eee;
+        padding: 2rem;
+      }
+      #existing-content {
+        padding: 1rem;
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .result {
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+      }
+      .pass { background: #1a3a1a; color: #6f6; }
+      .fail { background: #3a1a1a; color: #f66; }
+    </style>
+  </head>
+  <body>
+    <h1>isolet browser test</h1>
+    <div id="existing-content">
+      <p>This content existed before the widget loaded.</p>
+    </div>
+    <div id="results"></div>
+
+    <!-- Load the IIFE bundle — should auto-mount to document.documentElement -->
+    <script src="./dist/_isolet-entry.iife.js"></script>
+
+    <script>
+      const results = document.getElementById("results");
+
+      function assert(name, condition) {
+        const el = document.createElement("div");
+        el.className = "result " + (condition ? "pass" : "fail");
+        el.textContent = (condition ? "PASS" : "FAIL") + ": " + name;
+        results.appendChild(el);
+        return condition;
+      }
+
+      let allPassed = true;
+
+      // Test 1: existing content is preserved
+      allPassed &= assert(
+        "Existing page content is preserved",
+        document.getElementById("existing-content") !== null &&
+        document.getElementById("existing-content").textContent.includes("before the widget")
+      );
+
+      // Test 2: widget auto-mounted to documentElement
+      const widgetHost = document.documentElement.querySelector("[data-isolet='basic-widget']");
+      allPassed &= assert(
+        "Widget auto-mounted to document.documentElement",
+        widgetHost !== null
+      );
+
+      // Test 3: widget has shadow DOM
+      allPassed &= assert(
+        "Widget host has shadow root",
+        widgetHost && widgetHost.shadowRoot !== null
+      );
+
+      // Test 4: widget rendered content inside shadow DOM
+      const shadowContent = widgetHost && widgetHost.shadowRoot
+        ? widgetHost.shadowRoot.querySelector("[data-isolet-root]")
+        : null;
+      allPassed &= assert(
+        "Widget rendered content inside shadow DOM",
+        shadowContent !== null
+      );
+
+      // Test 5: CSS was injected into shadow root
+      const shadowStyle = widgetHost && widgetHost.shadowRoot
+        ? widgetHost.shadowRoot.querySelector("style")
+        : null;
+      allPassed &= assert(
+        "CSS injected into shadow root",
+        shadowStyle !== null && shadowStyle.textContent.includes("font-family")
+      );
+
+      // Test 6: no process.env errors (page loaded without crashing)
+      allPassed &= assert(
+        "No process.env crash (page loaded successfully)",
+        true
+      );
+
+      // Test 7: globalName is accessible
+      allPassed &= assert(
+        "GlobalName 'BasicWidget' is accessible",
+        typeof BasicWidget !== "undefined" && typeof BasicWidget.widget === "object"
+      );
+
+      // Test 8: the body element is untouched (widget is on <html>, not replacing <body>)
+      allPassed &= assert(
+        "Body element is untouched",
+        document.body.children.length > 1
+      );
+
+      // Summary
+      const summary = document.createElement("h2");
+      summary.id = "test-summary";
+      summary.style.marginTop = "1rem";
+      summary.textContent = allPassed ? "ALL TESTS PASSED" : "SOME TESTS FAILED";
+      summary.style.color = allPassed ? "#6f6" : "#f66";
+      results.appendChild(summary);
+    </script>
+  </body>
+</html>

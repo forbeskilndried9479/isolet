@@ -20,7 +20,7 @@ isolet packages any component into a self-contained widget with configurable iso
 
 - vite-plus with `pack` config (tsdown under the hood)
 - css-text plugin converts CSS to JS strings for shadow DOM injection
-- IIFE output exposes `globalThis.__ISOLET__`
+- IIFE output exposes `Isolet` global
 - ESM/CJS outputs with `.d.ts` generation
 - CLI builds as ESM-only for Node.js
 

@@ -3,11 +3,30 @@ import fs from "node:fs";
 import { resolve } from "node:path";
 import { execSync } from "node:child_process";
 
-const FIXTURE_DIR = resolve(import.meta.dirname, "fixtures/basic-widget");
-const DIST_DIR = resolve(FIXTURE_DIR, "dist");
 const CLI_PATH = resolve(import.meta.dirname, "../dist/cli.mjs");
 
+const findIife = (dir: string) => {
+  const files = fs.readdirSync(dir);
+  return files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
+};
+
+const findEsm = (dir: string) => {
+  const files = fs.readdirSync(dir);
+  return files.find(
+    (f) => f.endsWith(".js") && !f.includes("iife") && !f.includes("global"),
+  );
+};
+
+const readBundle = (dir: string, finder: (dir: string) => string | undefined) => {
+  const file = finder(dir);
+  if (!file) throw new Error("Bundle not found");
+  return fs.readFileSync(resolve(dir, file), "utf8");
+};
+
 describe("isolet build", () => {
+  const FIXTURE_DIR = resolve(import.meta.dirname, "fixtures/basic-widget");
+  const DIST_DIR = resolve(FIXTURE_DIR, "dist");
+
   beforeAll(() => {
     if (fs.existsSync(DIST_DIR)) {
       fs.rmSync(DIST_DIR, { recursive: true });
@@ -26,21 +45,15 @@ describe("isolet build", () => {
   });
 
   it("produces IIFE output", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    expect(iife).toBeDefined();
+    expect(findIife(DIST_DIR)).toBeDefined();
   });
 
   it("produces ESM output", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const esm = files.find((f) => f.endsWith(".js") && !f.includes("iife") && !f.includes("global"));
-    expect(esm).toBeDefined();
+    expect(findEsm(DIST_DIR)).toBeDefined();
   });
 
   it("inlines CSS from config styles field into the IIFE bundle", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+    const content = readBundle(DIST_DIR, findIife);
 
     expect(content).toContain("font-family");
     expect(content).toContain("sans-serif");
@@ -48,18 +61,12 @@ describe("isolet build", () => {
   });
 
   it("contains createIsolet in the bundle", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
-
+    const content = readBundle(DIST_DIR, findIife);
     expect(content).toContain("createIsolet");
   });
 
   it("exposes the configured globalName", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
-
+    const content = readBundle(DIST_DIR, findIife);
     expect(content).toContain("BasicWidget");
   });
 
@@ -74,9 +81,7 @@ describe("isolet build", () => {
   });
 
   it("inlines CSS url() references as data URIs that decode to real SVG", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+    const content = readBundle(DIST_DIR, findIife);
 
     expect(content).not.toContain("url(./icon.svg)");
 
@@ -90,9 +95,7 @@ describe("isolet build", () => {
   });
 
   it("inlines static asset imports as data URIs that decode to real SVG", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const esm = files.find((f) => f.endsWith(".js") && !f.includes("iife") && !f.includes("global"));
-    const content = fs.readFileSync(resolve(DIST_DIR, esm!), "utf8");
+    const content = readBundle(DIST_DIR, findEsm);
 
     const dataUriMatch = content.match(/data:image\/svg\+xml,([^"')\s]+)/);
     expect(dataUriMatch).toBeTruthy();
@@ -103,9 +106,7 @@ describe("isolet build", () => {
   });
 
   it("bundle is fully self-contained (no external requires)", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+    const content = readBundle(DIST_DIR, findIife);
 
     const externalRequires = content
       .split("\n")
@@ -118,13 +119,72 @@ describe("isolet build", () => {
   });
 
   it("CSS in bundle contains full stylesheet with all properties", () => {
-    const files = fs.readdirSync(DIST_DIR);
-    const iife = files.find((f) => f.endsWith(".global.js") || f.endsWith(".iife.js"));
-    const content = fs.readFileSync(resolve(DIST_DIR, iife!), "utf8");
+    const content = readBundle(DIST_DIR, findIife);
 
     expect(content).toContain(".widget");
     expect(content).toContain(".widget-icon");
     expect(content).toContain("background-image");
     expect(content).toContain("padding");
+  });
+
+  it("IIFE bundle contains auto-mount code targeting document.documentElement", () => {
+    const content = readBundle(DIST_DIR, findIife);
+    expect(content).toContain("document.documentElement");
+  });
+
+  it("ESM bundle does NOT contain auto-mount code", () => {
+    const content = readBundle(DIST_DIR, findEsm);
+    expect(content).not.toContain("document.documentElement");
+  });
+
+  it("replaces process.env.NODE_ENV so no raw process reference remains", () => {
+    const content = readBundle(DIST_DIR, findIife);
+    expect(content).not.toMatch(/\bprocess\.env\b/);
+  });
+
+  it("ESM bundle also has process.env.NODE_ENV replaced", () => {
+    const content = readBundle(DIST_DIR, findEsm);
+    expect(content).not.toMatch(/\bprocess\.env\b/);
+  });
+});
+
+describe("isolet build (autoMount: false)", () => {
+  const FIXTURE_DIR = resolve(import.meta.dirname, "fixtures/no-automount-widget");
+  const DIST_DIR = resolve(FIXTURE_DIR, "dist");
+
+  beforeAll(() => {
+    if (fs.existsSync(DIST_DIR)) {
+      fs.rmSync(DIST_DIR, { recursive: true });
+    }
+
+    execSync(`node ${CLI_PATH} build --cwd ${FIXTURE_DIR}`, {
+      stdio: "pipe",
+      env: { ...process.env, NODE_ENV: "development" },
+    });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(DIST_DIR)) {
+      fs.rmSync(DIST_DIR, { recursive: true });
+    }
+  });
+
+  it("produces IIFE output", () => {
+    expect(findIife(DIST_DIR)).toBeDefined();
+  });
+
+  it("IIFE does NOT contain auto-mount code when autoMount is false", () => {
+    const content = readBundle(DIST_DIR, findIife);
+    expect(content).not.toContain("document.documentElement");
+  });
+
+  it("still exposes the configured globalName", () => {
+    const content = readBundle(DIST_DIR, findIife);
+    expect(content).toContain("NoAutoMountWidget");
+  });
+
+  it("still replaces process.env.NODE_ENV", () => {
+    const content = readBundle(DIST_DIR, findIife);
+    expect(content).not.toMatch(/\bprocess\.env\b/);
   });
 });

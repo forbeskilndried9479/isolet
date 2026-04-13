@@ -6,7 +6,7 @@ export default defineConfig({
     {
       entry: ["./src/index.ts"],
       format: ["iife"],
-      globalName: "globalThis.__ISOLET__",
+      globalName: "Isolet",
       dts: false,
       clean: false,
       platform: "browser",

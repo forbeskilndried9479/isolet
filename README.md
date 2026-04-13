@@ -63,6 +63,7 @@ export default defineConfig({
   // dts: true,                     // emit .d.ts files
   // minify: true,                  // minify output
   // platform: "browser",           // target platform (default: "browser")
+  // autoMount: true,               // auto-mount to documentElement in IIFE (default: true)
 });
 ```
 
@@ -212,12 +213,12 @@ import { cssTextPlugin, inlineAssetsPlugin, autoStylesPlugin } from "isolet-js/p
 
 ## Script tag usage
 
-The IIFE build exposes `globalThis.__ISOLET__`:
+The IIFE build exposes `Isolet` on the global scope:
 
 ```html
 <script src="https://unpkg.com/isolet-js/dist/index.iife.js"></script>
 <script>
-  const { createIsolet } = __ISOLET__;
+  const { createIsolet } = Isolet;
 
   const widget = createIsolet({
     name: "inline-widget",

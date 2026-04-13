@@ -12,6 +12,12 @@ export interface IsoletConfig {
   dts?: boolean;
   minify?: boolean;
   platform?: "browser" | "node" | "neutral";
+  /**
+   * Auto-mount exported isolet instances to `document.documentElement`
+   * when loading the IIFE bundle. Defaults to `true`.
+   * Only affects IIFE output; ESM/CJS exports are not auto-mounted.
+   */
+  autoMount?: boolean;
 }
 
 const CONFIG_FILES = [

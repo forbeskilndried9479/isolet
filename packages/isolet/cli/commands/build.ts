@@ -39,7 +39,7 @@ const resolveStyles = (
 
 const VIRTUAL_ENTRY_ID = "\0isolet-entry";
 
-const wrapperEntryPlugin = (userEntry: string) => {
+const wrapperEntryPlugin = (userEntry: string, autoMount: boolean = false) => {
   return {
     name: "isolet-wrapper-entry",
     resolveId(source: string) {
@@ -47,49 +47,114 @@ const wrapperEntryPlugin = (userEntry: string) => {
     },
     load(id: string) {
       if (id !== VIRTUAL_ENTRY_ID) return;
-      return `export * from ${JSON.stringify(userEntry)};`;
+      const lines: string[] = [];
+      if (autoMount) {
+        lines.push(
+          `import * as __isolet_exports__ from ${JSON.stringify(userEntry)};`,
+        );
+      }
+      lines.push(`export * from ${JSON.stringify(userEntry)};`);
+      if (autoMount) {
+        lines.push(`for (var __k in __isolet_exports__) {`);
+        lines.push(`  var __v = __isolet_exports__[__k];`);
+        lines.push(
+          `  if (__v && typeof __v === 'object' && 'mount' in __v && 'mounted' in __v && !__v.mounted) {`,
+        );
+        lines.push(`    __v.mount(document.documentElement);`);
+        lines.push(`  }`);
+        lines.push(`}`);
+      }
+      return lines.join("\n");
     },
   };
 };
 
-const toTsdownConfig = (
+const toTsdownConfigs = (
   config: IsoletConfig,
   cwd: string,
   overrides: { watch?: boolean; minify?: boolean },
-): UserConfig => {
+): UserConfig[] => {
   const outDir = resolve(cwd, config.outDir ?? "dist");
   const formats = config.format ?? ["iife", "esm"];
   const minify = overrides.minify ?? config.minify ?? false;
-
   const cssText = resolveStyles(config, cwd);
   const userEntry = resolve(cwd, config.entry);
+  const autoMount = config.autoMount !== false;
 
-  const plugins = [
+  const makePlugins = () => [
     cssTextPlugin(),
     inlineAssetsPlugin(),
     autoStylesPlugin(),
   ];
 
-  const define: Record<string, string> = {};
+  const define: Record<string, string> = {
+    "process.env.NODE_ENV": JSON.stringify("production"),
+  };
 
   if (cssText) {
     define["__ISOLET_CSS__"] = JSON.stringify(cssText);
-    plugins.push(wrapperEntryPlugin(userEntry) as any);
   }
 
-  return {
-    entry: [cssText ? VIRTUAL_ENTRY_ID : userEntry],
-    format: formats,
+  const baseConfig = {
     outDir,
     globalName: config.globalName,
     external: config.external,
     dts: config.dts ?? false,
     minify,
-    platform: config.platform ?? "browser",
+    platform: (config.platform ?? "browser") as UserConfig["platform"],
     clean: false,
     define,
-    plugins,
   };
+
+  const needsWrapper = cssText != null;
+  const hasIife = formats.includes("iife");
+  const nonIifeFormats = formats.filter(
+    (f): f is "esm" | "cjs" => f !== "iife",
+  );
+  const shouldAutoMount = autoMount && hasIife;
+
+  if (shouldAutoMount && nonIifeFormats.length > 0) {
+    return [
+      {
+        ...baseConfig,
+        entry: [VIRTUAL_ENTRY_ID],
+        format: ["iife"] as UserConfig["format"],
+        dts: false,
+        plugins: [...makePlugins(), wrapperEntryPlugin(userEntry, true)] as any,
+      },
+      {
+        ...baseConfig,
+        entry: [needsWrapper ? VIRTUAL_ENTRY_ID : userEntry],
+        format: nonIifeFormats as UserConfig["format"],
+        plugins: (needsWrapper
+          ? [...makePlugins(), wrapperEntryPlugin(userEntry, false)]
+          : makePlugins()) as any,
+      },
+    ];
+  }
+
+  if (shouldAutoMount || needsWrapper) {
+    return [
+      {
+        ...baseConfig,
+        entry: [VIRTUAL_ENTRY_ID],
+        format: formats as UserConfig["format"],
+        plugins: [
+          ...makePlugins(),
+          wrapperEntryPlugin(userEntry, shouldAutoMount),
+        ] as any,
+      },
+    ];
+  }
+
+  return [
+    {
+      ...baseConfig,
+      entry: [userEntry],
+      format: formats as UserConfig["format"],
+      plugins: makePlugins() as any,
+    },
+  ];
 };
 
 export const build = async (options: BuildOptions) => {
@@ -107,19 +172,21 @@ export const build = async (options: BuildOptions) => {
   for (const config of configs) {
     log.info(`Building isolet: ${config.name}`);
 
-    const tsdownConfig = toTsdownConfig(config, cwd, {
+    const tsdownConfigs = toTsdownConfigs(config, cwd, {
       watch: options.watch,
       minify: options.minify,
     });
 
     log.info(`Entry: ${config.entry}`);
-    log.info(`Output: ${tsdownConfig.outDir}`);
-    log.info(`Formats: ${(tsdownConfig.format as string[]).join(", ")}`);
-    if (tsdownConfig.minify) log.info("Minification: enabled");
+    log.info(`Output: ${tsdownConfigs[0]!.outDir}`);
+    log.info(`Formats: ${(config.format ?? ["iife", "esm"]).join(", ")}`);
+    if (tsdownConfigs[0]!.minify) log.info("Minification: enabled");
     if (options.watch) log.info("Watch mode: enabled");
 
     try {
-      await tsdownBuild(tsdownConfig);
+      for (const tsdownConfig of tsdownConfigs) {
+        await tsdownBuild(tsdownConfig);
+      }
       log.success(`Built ${config.name}`);
     } catch (err) {
       log.error(`Failed to build ${config.name}: ${(err as Error).message}`);

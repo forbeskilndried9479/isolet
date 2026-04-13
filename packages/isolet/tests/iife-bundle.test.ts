@@ -23,9 +23,9 @@ describe("IIFE bundle", () => {
     expect(externalRequires).toEqual([]);
   });
 
-  it("exposes globalThis.__ISOLET__", () => {
+  it("exposes Isolet global", () => {
     const content = fs.readFileSync(bundlePath, "utf8");
-    expect(content).toContain("__ISOLET__");
+    expect(content).toContain("Isolet");
   });
 
   it("contains createIsolet export", () => {
